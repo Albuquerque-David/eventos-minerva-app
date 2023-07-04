@@ -1,6 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dio/dio.dart';
+import 'package:eventos_minerva/user_data_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'api_client.dart';
+import 'main_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -13,12 +17,11 @@ class _LoginPageState extends State<LoginPage> {
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController() ;
+  final ApiClient _apiClient = ApiClient();
 
   Future signIn() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim()
-    );
+    await _apiClient.login(_emailController.text.trim(), _passwordController.text.trim());
+    userDataBloc.sendDataToStream("Logado");
   }
 
   @override
@@ -45,8 +48,8 @@ class _LoginPageState extends State<LoginPage> {
               Text(
                 'Eventos Minerva',
                 style: GoogleFonts.bebasNeue(
-                  fontSize: 52,
-                  color: const Color(0xffd08c22)
+                    fontSize: 52,
+                    color: const Color(0xffd08c22)
                 ),
               ),
               SizedBox(height: 10),

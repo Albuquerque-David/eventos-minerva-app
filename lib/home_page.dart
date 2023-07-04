@@ -1,24 +1,32 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:eventos_minerva/login_page.dart';
 import 'package:eventos_minerva/main_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:eventos_minerva/user_data_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
+import 'api_client.dart';
 
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final ApiClient _apiClient = ApiClient();
+
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
+      body: StreamBuilder(
+        stream: userDataBloc.stream,
         builder: (context, snapshot){
-          if (snapshot.hasData) {
+          if ( snapshot.hasData && snapshot.data.toString() == "Deslogado") {
+            return LoginPage();
+          } else if ( snapshot.hasData && snapshot.data.toString() == "Logado" ) {
             return MainPage();
-          } else {
+          }
+          else {
             return LoginPage();
           }
         },
