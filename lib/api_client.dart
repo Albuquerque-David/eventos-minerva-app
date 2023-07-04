@@ -6,7 +6,7 @@ class ApiClient {
   Future<Response> signUp(String email, String password) async {
     try {
       Response response = await _dio.post(
-          'http://192.168.0.73:3000/signup',
+          'https://eventos-minerva-api.vercel.app/signup',
           data: {
             'email': email,
             'password': password
@@ -20,7 +20,7 @@ class ApiClient {
   Future<Response?> login(String email, String password) async {
     try {
       Response response = await _dio.post(
-        'http://192.168.0.73:3000/login',
+        'https://eventos-minerva-api.vercel.app/login',
         data: {
           'email': email,
           'password': password
@@ -35,7 +35,7 @@ class ApiClient {
   Future<Response> getUserProfileData() async {
     try {
       Response response = await _dio.get(
-        'http://192.168.0.73:3000/getUserData',
+        'https://eventos-minerva-api.vercel.app/getUserData',
       );
       return response;
     } on DioException catch (e) {
@@ -47,7 +47,7 @@ class ApiClient {
   Future<Response> logout() async {
     try {
       Response response = await _dio.post(
-        'http://192.168.0.73:3000/logout',
+        'https://eventos-minerva-api.vercel.app/logout',
       );
       return response;
     } on DioException catch (e) {

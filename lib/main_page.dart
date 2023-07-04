@@ -92,6 +92,9 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
             Tab(
               text: "Favoritos",
             ),
+            Tab(
+              text: "Usuário",
+            )
           ],
           indicatorColor: Color(0xffd08c22),
             labelColor: Colors.black,
@@ -144,8 +147,32 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
               ],
             ),
           ),
+          SingleChildScrollView(
+            child: FutureBuilder<Response<dynamic>?> (
+                future: _apiClient.getUserProfileData(),
+                builder: (context, snapshot) {
+                  String email = "Carregando...";
+                  if(snapshot.hasData) {
+                    email = snapshot.data?.data;
+                  }
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Estou logado como: " + email!),
+                      MaterialButton(
+                          onPressed: () async {
+                            await _apiClient.logout();
+                            userDataBloc.sendDataToStream("Deslogado");
+                          },
+                          color: const Color(0xffd08c22),
+                          child: Text('Sair'))
+                    ],
+                  );
+                }),
+          )
         ],
       ),
+
     );
   }
 }
