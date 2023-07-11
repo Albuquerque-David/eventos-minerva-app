@@ -19,18 +19,20 @@ class CardExample extends StatelessWidget {
   final String nome;
   final String data;
   final String url;
+  final String description;
 
   const CardExample({
     Key? key,
     required this.nome,
     required this.data,
+    required this.description,
     required this.url,
   }) : super(key: key);
 
   void _openNewPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EventPage(nome: this.nome, data: this.data, url: this.url)),
+      MaterialPageRoute(builder: (context) => EventPage(nome: this.nome, description: this.description, data: this.data, url: this.url)),
     );
   }
 
@@ -63,17 +65,21 @@ class CardExample extends StatelessWidget {
 }
 
 class Evento {
-  final int id;
-  final String nome;
-  final String data;
+  final String id;
+  final String name;
+  final String description;
+  final String date;
+  final String image;
 
-  Evento({required this.id, required this.nome, required this.data});
+  Evento({required this.id, required this.name, required this.description, required this.date, required this.image});
 
   factory Evento.fromJson(Map<String, dynamic> json) {
     return Evento(
       id: json['id'],
-      nome: json['nome'],
-      data: json['data'],
+      name: json['name'],
+      description: json['description'],
+      date: json['date'],
+      image: json['image']
     );
   }
 }
@@ -142,25 +148,22 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
-                  List<Evento> eventos = snapshot.data as List<Evento>;
-                  print('a1-----\n');
-                  print(eventos);
-                  print(snapshot);
-                  print('b1-----\n');
+                  final jsonData = snapshot.data?.data;
+                  List<Evento> eventos = (jsonData as List<dynamic>)
+                      .map((item) => Evento.fromJson(item))
+                      .toList();
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: eventos!.map((evento) {
                       return CardExample(
-                        nome: evento.nome,
-                        data: evento.data,
-                        url: 'https://example.com/image.jpg',
+                        nome: evento.name,
+                        description: evento.description,
+                        data: evento.date,
+                        url: 'https://i.ibb.co/QnB7kWj/im2.png',
                       );
                     }).toList(),
                   );
                 } else {
-                  print('a-----\n');
-                  print(snapshot);
-                  print('b-----\n');
                   return Text('No events found.');
                 }
               },
@@ -172,11 +175,13 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
               children: [
                 CardExample(
                   nome: 'Semana da Computação',
+                  description: "dadsada",
                   data: '25/07 à 28/07',
                   url: 'https://i.ibb.co/rFdb0Xf/im3.png',
                 ),
                 CardExample(
                   nome: 'Hackton do Minervas',
+                  description: "dasdsadas",
                   data: '05/03 à 14/04',
                   url: 'https://i.ibb.co/QnB7kWj/im2.png',
                 ),

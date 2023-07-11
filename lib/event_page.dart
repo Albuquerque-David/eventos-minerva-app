@@ -3,10 +3,11 @@ import 'package:eventos_minerva/event_schedule.dart';
 
 class EventPage extends StatefulWidget {
   final String nome;
+  final String description;
   final String data;
   final String url;
 
-  EventPage({required this.nome, required this.data, required this.url});
+  EventPage({required this.nome, required this.description, required this.data, required this.url});
 
   @override
   _EventPageState createState() => _EventPageState();
@@ -71,7 +72,7 @@ class _EventPageState extends State<EventPage> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'Lorem ipsum dolor sit amet...',
+                    widget.description.toUpperCase(),
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
