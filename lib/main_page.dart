@@ -68,7 +68,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -166,7 +166,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Estou logado como: " + email!),
+                      Text("Estou logado como: " + email),
                       MaterialButton(
                           onPressed: () async {
                             await _apiClient.logout();
