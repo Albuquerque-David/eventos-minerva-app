@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:eventos_minerva/programming_page.dart';
+import 'package:eventos_minerva/event_schedule.dart';
 
-class EventPage extends StatelessWidget {
+class EventPage extends StatefulWidget {
   final String nome;
   final String data;
   final String url;
 
   EventPage({required this.nome, required this.data, required this.url});
+
+  @override
+  _EventPageState createState() => _EventPageState();
+}
+
+class _EventPageState extends State<EventPage> {
+  bool favoritado = false;
 
   void _openProgramming(BuildContext context) {
     Navigator.push(
@@ -22,18 +29,18 @@ class EventPage extends StatelessWidget {
         title: Text('Eventos Minerva'),
       ),
       body: SingleChildScrollView(
-      child: Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child:Image(
-              width: double.infinity,
-              height: 200.0,
-              fit: BoxFit.cover,
-              image: NetworkImage(this.url),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Image(
+                width: double.infinity,
+                height: 200.0,
+                fit: BoxFit.cover,
+                image: NetworkImage(widget.url),
+              ),
             ),
-          ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
               child: Column(
@@ -41,25 +48,30 @@ class EventPage extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        this.nome.toUpperCase(),
+                        widget.nome.toUpperCase(),
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Spacer(),
-                      Icon(
-                          //Icons.favorite_border,
-                          //color: Colors.black87,
-                          Icons.favorite,
-                          color: Colors.pink,
-                          size: 20
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            favoritado = !favoritado;
+                          });
+                        },
+                        child: Icon(
+                          favoritado ? Icons.favorite : Icons.favorite_border,
+                          color: favoritado ? Colors.pink : Colors.black87,
+                          size: 20,
+                        ),
                       ),
-                    ]
+                    ],
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'Lorem ipsum dolor sit amet. Et iusto aliquid est dicta omnis est tempora pariatur qui commodi assumenda qui nemo dolore. In voluptatem perferendis sit quia nobis At omnis dolorem ut quam perspiciatis est nisi illo.',
+                    'Lorem ipsum dolor sit amet...',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
@@ -67,11 +79,11 @@ class EventPage extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   FilledButton.tonal(
-                      onPressed: () => _openProgramming(context),
-                      child: const Text('PROGRAMAÇÃO'),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50)
-                      ),
+                    onPressed: () => _openProgramming(context),
+                    child: const Text('PROGRAMAÇÃO'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                    ),
                   ),
                   SizedBox(height: 32),
                   Align(
@@ -94,12 +106,12 @@ class EventPage extends StatelessWidget {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        this.data,
+                        widget.data,
                         style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
-                      )
                     ],
                   ),
                   SizedBox(height: 8),
@@ -108,7 +120,7 @@ class EventPage extends StatelessWidget {
                       Icon(
                         Icons.place_outlined,
                         color: Colors.black87,
-                        size: 24
+                        size: 24,
                       ),
                       SizedBox(width: 8),
                       Text(
@@ -117,12 +129,12 @@ class EventPage extends StatelessWidget {
                           fontSize: 16,
                           color: Colors.grey,
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ],
-              )
-            )
+              ),
+            ),
           ],
         ),
       ),

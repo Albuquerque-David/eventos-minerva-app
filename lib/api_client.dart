@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import 'main_page.dart';
+
 class ApiClient {
   final Dio _dio = Dio();
 
@@ -31,6 +33,22 @@ class ApiClient {
       return e.response;
     }
   }
+  Future<Response?> fetchEvents() async {
+    try {
+      Response response = await _dio.get(
+        'https://eventos-minerva-api.vercel.app/events',
+      );
+      print(response);
+      List<dynamic> jsonList = response.data;
+      List<Evento> eventos = jsonList.map((jsonObject) => Evento.fromJson(jsonObject)).toList();
+      print(eventos);
+      return response;
+    } on DioException catch (e) {
+      return e.response;
+    }
+  }
+
+
 
   Future<Response> getUserProfileData() async {
     try {
