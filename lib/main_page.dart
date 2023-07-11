@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:eventos_minerva/event_page.dart';
 import 'package:eventos_minerva/api_client.dart';
+import 'package:eventos_minerva/home_page.dart';
 import 'package:eventos_minerva/user_data_bloc.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +26,13 @@ class CardExample extends StatelessWidget {
     required this.url,
   }) : super(key: key);
 
+  void _openNewPage(BuildContext context) {
+  Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => EventPage(nome: this.nome, data: this.data, url: this.url)),
+  );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -31,9 +40,7 @@ class CardExample extends StatelessWidget {
       margin: EdgeInsets.all(16.0),
       child: InkWell(
         splashColor: Colors.blue.withAlpha(30),
-        onTap: () {
-          debugPrint('Card tapped.');
-        },
+        onTap: () => _openNewPage(context),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -74,13 +81,14 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Minerva Eventos"),
-          actions: <Widget>[ IconButton(
+        title: Text("Eventos Minerva"),
+          actions: <Widget>[
+            IconButton(
           icon: const Icon(Icons.search),
-          tooltip: 'Show Snackbar',
+          tooltip: 'Pesquisar',
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('This is a snackbar')));
+                const SnackBar(content: Text('This is a search')));
           },
         )],
         bottom: TabBar(
@@ -113,7 +121,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                   url: 'https://i.ibb.co/Cz7XRkr/ufrj1.jpg',
                 ),
                 CardExample(
-                  nome: 'Hackton do Minervas',
+                  nome: 'Hackthon do Minervas',
                   data: '05/03 à 14/04',
                   url: 'https://i.ibb.co/bzd35Fm/img1.jpg',
                 ),
@@ -123,7 +131,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                   url: 'https://i.ibb.co/rFdb0Xf/im3.png',
                 ),
                 CardExample(
-                  nome: 'Hackton do Minervas',
+                  nome: 'Hackthon do Minervas',
                   data: '05/03 à 14/04',
                   url: 'https://i.ibb.co/QnB7kWj/im2.png',
                 ),
