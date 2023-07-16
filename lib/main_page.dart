@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:eventos_minerva/config_page.dart';
 import 'package:eventos_minerva/event_page.dart';
 import 'package:eventos_minerva/api_client.dart';
+import 'package:eventos_minerva/help_page.dart';
 import 'package:eventos_minerva/home_page.dart';
 import 'package:eventos_minerva/user_data_bloc.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
+
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final Dio _dio = Dio();
 
@@ -36,11 +41,11 @@ class CardExample extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => EventPage(
-          nome: this.nome,
-          description: this.description,
-          data: this.data,
-          url: this.url,
-          schedules: this.schedules,
+          nome: nome,
+          description: description,
+          data: data,
+          url: url,
+          schedules: schedules,
         ),
       ),
     );
@@ -50,7 +55,7 @@ class CardExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16.0),
       child: InkWell(
         splashColor: Colors.blue.withAlpha(30),
         onTap: () => _openNewPage(context),
@@ -61,11 +66,11 @@ class CardExample extends StatelessWidget {
               width: double.infinity,
               height: 200.0,
               fit: BoxFit.cover,
-              image: NetworkImage(this.url),
+              image: NetworkImage(url),
             ),
             ListTile(
-              title: Text(this.nome),
-              subtitle: Text(this.data),
+              title: Text(nome),
+              subtitle: Text(data),
             ),
 
           ],
@@ -137,11 +142,12 @@ class Evento {
 class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin {
   final ApiClient _apiClient = ApiClient();
   late TabController _tabController;
+  late String userEmail = '';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -152,9 +158,26 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent), // Definir a cor de fundo da barra de status como transparente
+    );
+
+    _getUserEmailFromSharedPreferences();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Eventos Minerva"),
+        title: const Text("Eventos Minerva"),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.search),
@@ -168,19 +191,78 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(
               text: "Todos",
             ),
             Tab(
               text: "Favoritos",
             ),
-            Tab(
-              text: "Usuário",
-            )
           ],
-          indicatorColor: Color(0xffd08c22),
+          indicatorColor: const Color(0xffd08c22),
           labelColor: Colors.black,
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+              Container(
+                child: UserAccountsDrawerHeader(
+                  accountName: Text('Nome do usuário'),
+                  accountEmail: Text(userEmail),
+                  currentAccountPicture: const CircleAvatar(
+                    backgroundImage: NetworkImage('https://kb.rspca.org.au/wp-content/uploads/2021/07/collie-beach-bokeh.jpg'),
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Color(0xffd08c22), // Cor de fundo amarelo
+                  ),
+                ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.popUntil(context, ModalRoute.withName('/')); // Fechar o menu hamburguer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                );  // Navegar para a página "Home"
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Configurações'),
+              onTap: () {
+                Navigator.popUntil(context, ModalRoute.withName('/')); // Fechar o menu hamburguer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ConfigPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.help_center),
+              title: const Text('Ajuda'),
+              onTap: () {
+                Navigator.popUntil(context, ModalRoute.withName('/')); // Fechar o menu hamburguer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HelpPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Sair'),
+              onTap: () async {
+                await _apiClient.logout(context);
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage())
+                );
+              },
+            ),
+          ],
         ),
       ),
       body: TabBarView(
@@ -192,8 +274,8 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(),
                     heightFactor: 5,
+                    child: CircularProgressIndicator(),
                   );
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
@@ -215,7 +297,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                         .toList(),
                   );
                 } else {
-                  return Text('No events found.');
+                  return const Text('No events found.');
                 }
               },
             ),
@@ -241,42 +323,14 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
               ],
             ),
           ),
-          SingleChildScrollView(
-            child: FutureBuilder<Response<dynamic>?>(
-              future: _apiClient.getUserProfileData(context),
-              builder: (context, snapshot) {
-                String email = "Carregando...";
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                    heightFactor: 5,
-                  );
-                }
-                if (snapshot.hasData) {
-                  email = snapshot.data?.data;
-                }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Estou logado como: " + email),
-                    MaterialButton(
-                      onPressed: () async {
-                        await _apiClient.logout(context);
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HomePage())
-                        );
-                      },
-                      color: const Color(0xffd08c22),
-                      child: Text('Sair'),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
         ],
       ),
     );
+  }
+
+
+  Future<void> _getUserEmailFromSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userEmail = prefs.getString('email') ?? '';
   }
 }
