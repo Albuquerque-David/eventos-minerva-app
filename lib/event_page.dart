@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:eventos_minerva/event_schedule.dart';
 
+import 'main_page.dart';
+
+
 class EventPage extends StatefulWidget {
+
   final String nome;
   final String description;
   final String data;
   final String url;
+  final List<Schedule> schedules;
 
-  EventPage({required this.nome, required this.description, required this.data, required this.url});
+  EventPage({required this.nome, required this.description, required this.data, required this.url, required this.schedules});
 
   @override
   _EventPageState createState() => _EventPageState();
@@ -16,15 +21,16 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   bool favoritado = false;
 
-  void _openProgramming(BuildContext context) {
+  void _openProgramming(BuildContext context, List<Schedule> s) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ProgrammingPage()),
+      MaterialPageRoute(builder: (context) => ProgrammingPage(schedules: s)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Eventos Minerva'),
@@ -80,7 +86,7 @@ class _EventPageState extends State<EventPage> {
                   ),
                   SizedBox(height: 16),
                   FilledButton.tonal(
-                    onPressed: () => _openProgramming(context),
+                    onPressed: () => _openProgramming(context, widget.schedules),
                     child: const Text('PROGRAMAÇÃO'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),

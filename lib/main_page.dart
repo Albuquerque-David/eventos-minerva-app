@@ -20,6 +20,7 @@ class CardExample extends StatelessWidget {
   final String data;
   final String url;
   final String description;
+  final List<Schedule> schedules;
 
   const CardExample({
     Key? key,
@@ -27,12 +28,21 @@ class CardExample extends StatelessWidget {
     required this.data,
     required this.description,
     required this.url,
+    required this.schedules,
   }) : super(key: key);
 
   void _openNewPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EventPage(nome: this.nome, description: this.description, data: this.data, url: this.url)),
+      MaterialPageRoute(
+        builder: (context) => EventPage(
+          nome: this.nome,
+          description: this.description,
+          data: this.data,
+          url: this.url,
+          schedules: this.schedules,
+        ),
+      ),
     );
   }
 
@@ -57,6 +67,7 @@ class CardExample extends StatelessWidget {
               title: Text(this.nome),
               subtitle: Text(this.data),
             ),
+
           ],
         ),
       ),
@@ -64,22 +75,61 @@ class CardExample extends StatelessWidget {
   }
 }
 
+class Schedule {
+  final String scheduleName;
+  final String scheduleHour;
+  final String scheduleDescription;
+
+  Schedule({
+    required this.scheduleName,
+    required this.scheduleHour,
+    required this.scheduleDescription,
+  });
+
+  factory Schedule.fromJson(Map<String, dynamic> json) {
+    return Schedule(
+      scheduleName: json['name'],
+      scheduleHour: json['hour'],
+      scheduleDescription: json['description'],
+    );
+  }
+}
+
+List<Schedule> schedules1 = [
+  Schedule(scheduleName: 'test1', scheduleHour: '2023-05-05 23:15:54.590', scheduleDescription: 'test schedule 1'),
+  Schedule(scheduleName: 'test2', scheduleHour: '2023-05-05 23:30:00.000', scheduleDescription: 'test schedule 2'),
+];
+
 class Evento {
   final String id;
   final String name;
   final String description;
   final String date;
   final String image;
+  final List<Schedule> schedules;
 
-  Evento({required this.id, required this.name, required this.description, required this.date, required this.image});
+  Evento({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.date,
+    required this.image,
+    required this.schedules,
+  });
 
   factory Evento.fromJson(Map<String, dynamic> json) {
+    List<dynamic> schedulesJson = json['schedule'];
+    List<Schedule> schedules = schedulesJson
+        .map((item) => Schedule.fromJson(item))
+        .toList();
+
     return Evento(
       id: json['id'],
       name: json['name'],
       description: json['description'],
       date: json['date'],
-      image: json['image']
+      image: json['image'],
+      schedules: schedules,
     );
   }
 }
@@ -99,8 +149,6 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     _tabController.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +190,6 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
             child: FutureBuilder<Response<dynamic>?>(
               future: _apiClient.fetchEvents(),
               builder: (context, snapshot) {
-
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 } else if (snapshot.hasError) {
@@ -154,14 +201,15 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                       .toList();
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: eventos!.map((evento) {
-                      return CardExample(
-                        nome: evento.name,
-                        description: evento.description,
-                        data: evento.date,
-                        url: 'https://i.ibb.co/QnB7kWj/im2.png',
-                      );
-                    }).toList(),
+                    children: eventos
+                        .map((evento) => CardExample(
+                      nome: evento.name,
+                      description: evento.description,
+                      data: evento.date,
+                      url: 'https://i.ibb.co/QnB7kWj/im2.png',
+                      schedules: evento.schedules,
+                    ))
+                        .toList(),
                   );
                 } else {
                   return Text('No events found.');
@@ -178,14 +226,15 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                   description: "dadsada",
                   data: '25/07 à 28/07',
                   url: 'https://i.ibb.co/rFdb0Xf/im3.png',
+                  schedules: schedules1,
                 ),
                 CardExample(
                   nome: 'Hackton do Minervas',
                   description: "dasdsadas",
                   data: '05/03 à 14/04',
                   url: 'https://i.ibb.co/QnB7kWj/im2.png',
+                  schedules: schedules1,
                 ),
-
               ],
             ),
           ),
