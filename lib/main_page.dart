@@ -209,7 +209,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                       nome: evento.name,
                       description: evento.description,
                       data: evento.date,
-                      url: 'https://i.ibb.co/QnB7kWj/im2.png',
+                      url: evento.image,
                       schedules: evento.schedules,
                     ))
                         .toList(),

@@ -42,11 +42,33 @@ class ApiClient {
     }
   }
 
+  Future getEventImage(BuildContext context, String imagePath) async {
+    try {
+      Response response = await _dio.post(
+        'https://eventos-minerva-api.vercel.app/event/image',
+        data: {
+          'imageName': imagePath,
+        },
+      );
+      String imageUrl = response.data['imageURL'];
+      return imageUrl;
+    } on DioException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return e.response!.data;
+    }
+  }
+
   Future<Response?> fetchEvents(BuildContext context) async {
     try {
       Response response = await _dio.get(
         'https://eventos-minerva-api.vercel.app/events',
       );
+
+      await Future.forEach(response.data as List<dynamic>, (event) async {
+        var imageURL = await getEventImage(context, (event as Map<String, dynamic>)["image"]);
+        (event)["image"] = imageURL;
+      });
+
       return response;
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
