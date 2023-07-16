@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:eventos_minerva/user_data_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_client.dart';
+import 'home_page.dart';
 import 'main_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,8 +24,12 @@ class _LoginPageState extends State<LoginPage> {
   final ApiClient _apiClient = ApiClient();
 
   Future signIn() async {
-    await _apiClient.login(_emailController.text.trim(), _passwordController.text.trim());
-    userDataBloc.sendDataToStream("Logado");
+    try {
+      var response = await _apiClient.login(_emailController.text.trim(), _passwordController.text.trim(), context);
+      return true;
+    } on Exception catch (e) {
+      return false;
+    }
   }
 
   @override
@@ -106,7 +114,16 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: GestureDetector(
-                  onTap: signIn,
+                  onTap: () async {
+                    bool signed = await signIn();
+                    if (signed) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomePage())
+                      );
+                    }
+
+                  },
                   child: Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(

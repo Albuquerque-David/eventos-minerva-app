@@ -140,11 +140,14 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
         children: [
           SingleChildScrollView(
             child: FutureBuilder<Response<dynamic>?>(
-              future: _apiClient.fetchEvents(),
+              future: _apiClient.fetchEvents(context),
               builder: (context, snapshot) {
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                    heightFactor: 5,
+                  );
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
@@ -191,9 +194,15 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
           ),
           SingleChildScrollView(
             child: FutureBuilder<Response<dynamic>?>(
-              future: _apiClient.getUserProfileData(),
+              future: _apiClient.getUserProfileData(context),
               builder: (context, snapshot) {
                 String email = "Carregando...";
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                    heightFactor: 5,
+                  );
+                }
                 if (snapshot.hasData) {
                   email = snapshot.data?.data;
                 }
@@ -203,8 +212,11 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                     Text("Estou logado como: " + email),
                     MaterialButton(
                       onPressed: () async {
-                        await _apiClient.logout();
-                        userDataBloc.sendDataToStream("Deslogado");
+                        await _apiClient.logout(context);
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomePage())
+                        );
                       },
                       color: const Color(0xffd08c22),
                       child: Text('Sair'),
