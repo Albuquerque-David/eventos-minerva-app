@@ -4,6 +4,7 @@ import 'package:eventos_minerva/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HelpPage extends StatefulWidget {
   const HelpPage({Key? key}) : super(key: key);
@@ -119,8 +120,34 @@ class _HelpPageState extends State<HelpPage>
           ],
         ),
       ),
-      body: Center(
-        child: Text('Página Ajuda!'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Bem-vindo ao aplicativo Eventos Minerva!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Este aplicativo permite que você explore e participe de eventos promovidos pela Universidade Federal do Rio de Janeiro. Aqui você encontrará informações sobre os eventos, sua programação e poderá favoritar os eventos de seu interesse.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _sendEmail,
+              child: Text('Entre em Contato Conosco'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -128,5 +155,21 @@ class _HelpPageState extends State<HelpPage>
   Future<void> _getUserEmailFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userEmail = prefs.getString('email') ?? '';
+  }
+
+  void _sendEmail() async {
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: 'contato@eventosminerva.com',
+      query: 'subject=Dúvida sobre o aplicativo Eventos Minerva',
+    );
+    final String url = params.toString();
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Não foi possível abrir o aplicativo de e-mail.'),
+      ));
+    }
   }
 }

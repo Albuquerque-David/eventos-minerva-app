@@ -43,6 +43,7 @@ class ApiClient {
 
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
       return e.response!.data;
     }
   }

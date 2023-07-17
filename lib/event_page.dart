@@ -3,7 +3,6 @@ import 'package:eventos_minerva/event_schedule.dart';
 import 'package:eventos_minerva/api_client.dart';
 import 'main_page.dart';
 
-
 class EventPage extends StatefulWidget {
   final String id;
   final String nome;
@@ -12,7 +11,14 @@ class EventPage extends StatefulWidget {
   final String url;
   final List<Schedule> schedules;
 
-  EventPage({required this.id ,required this.nome, required this.description, required this.data, required this.url, required this.schedules});
+  EventPage({
+    required this.id,
+    required this.nome,
+    required this.description,
+    required this.data,
+    required this.url,
+    required this.schedules,
+  });
 
   @override
   _EventPageState createState() => _EventPageState();
@@ -31,14 +37,15 @@ class _EventPageState extends State<EventPage> {
   Future<void> _initializeFavoriteStatus() async {
     try {
       final response = await _apiClient.checkFavorite(widget.id, context);
-      print(response);
       setState(() {
-        favoritado = response.data;
+        favoritado = response == 'true';
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error checking favorite status'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error checking favorite status'),
+        ),
+      );
     }
   }
 
@@ -106,7 +113,8 @@ class _EventPageState extends State<EventPage> {
                   ),
                   SizedBox(height: 16),
                   FilledButton.tonal(
-                    onPressed: () => _openProgramming(context, widget.schedules),
+                    onPressed: () =>
+                        _openProgramming(context, widget.schedules),
                     child: const Text('PROGRAMAÇÃO'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
