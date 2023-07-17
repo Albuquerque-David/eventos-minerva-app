@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:eventos_minerva/event_schedule.dart';
-
+import 'package:eventos_minerva/api_client.dart';
 import 'main_page.dart';
 
 
 class EventPage extends StatefulWidget {
-
+  final String id;
   final String nome;
   final String description;
   final String data;
   final String url;
   final List<Schedule> schedules;
 
-  EventPage({required this.nome, required this.description, required this.data, required this.url, required this.schedules});
+  EventPage({required this.id ,required this.nome, required this.description, required this.data, required this.url, required this.schedules});
 
   @override
   _EventPageState createState() => _EventPageState();
@@ -20,6 +20,27 @@ class EventPage extends StatefulWidget {
 
 class _EventPageState extends State<EventPage> {
   bool favoritado = false;
+  final ApiClient _apiClient = ApiClient();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFavoriteStatus();
+  }
+
+  Future<void> _initializeFavoriteStatus() async {
+    try {
+      final response = await _apiClient.checkFavorite(widget.id, context);
+      print(response);
+      setState(() {
+        favoritado = response.data;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error checking favorite status'),
+      ));
+    }
+  }
 
   void _openProgramming(BuildContext context, List<Schedule> s) {
     Navigator.push(
@@ -30,7 +51,6 @@ class _EventPageState extends State<EventPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Eventos Minerva'),

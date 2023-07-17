@@ -8,24 +8,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_client.dart';
 import 'home_page.dart';
-import 'sign_up_page.dart';
+import 'login_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LoginPageState();
+  State<StatefulWidget> createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpPageState extends State<SignUpPage> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final ApiClient _apiClient = ApiClient();
 
-  Future signIn() async {
+  bool _isEmailValid = true;
+  bool _isPasswordValid = true;
+
+  Future signUp() async {
     try {
-      var response = await _apiClient.login(
-          _emailController.text.trim(), _passwordController.text.trim(), context);
+      var response = await _apiClient.register(
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+        context,
+      );
       return true;
     } on Exception catch (e) {
       return false;
@@ -34,9 +42,29 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  bool _validateEmail(String value) {
+    if (value.isEmpty) {
+      return true;
+    } else {
+      final emailRegex =
+          r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})$';
+      final RegExp regex = RegExp(emailRegex);
+      return !regex.hasMatch(value);
+    }
+  }
+
+  bool _validatePassword(String value) {
+    if (value.isEmpty) {
+      return true;
+    } else {
+      return value.length < 8;
+    }
   }
 
   @override
@@ -64,10 +92,31 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Seja bem-vindo!',
+                  'Cadastro',
                   style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Nome',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Container(
@@ -83,7 +132,13 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Email',
+                          errorText: _isEmailValid ? null : 'Digite um email válido',
                         ),
+                        onChanged: (value) {
+                          setState(() {
+                            _isEmailValid = _validateEmail(value);
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -105,18 +160,24 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Senha',
+                          errorText: _isPasswordValid ? null : 'A senha deve ter no mínimo 8 caracteres',
                         ),
+                        onChanged: (value) {
+                          setState(() {
+                            _isPasswordValid = _validatePassword(value);
+                          });
+                        },
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: GestureDetector(
                     onTap: () async {
-                      bool signed = await signIn();
-                      if (signed) {
+                      bool signedUp = await signUp();
+                      if (signedUp) {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => const HomePage()),
@@ -131,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: Center(
                         child: Text(
-                          'Entrar',
+                          'Cadastrar',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -143,28 +204,19 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 SizedBox(height: 25),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Não possui conta? ',
-                      style: TextStyle(),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
+                    );
+                  },
+                  child: Text(
+                    'Já possui uma conta? Faça login aqui!',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const SignUpPage()),
-                        );
-                      },
-                      child: Text(
-                        'Cadastre-se aqui!',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
