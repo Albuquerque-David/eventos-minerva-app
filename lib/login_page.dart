@@ -114,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: GestureDetector(
+                    key: const Key('login'),
                     onTap: () async {
                       bool signed = await signIn();
                       if (signed) {
