@@ -52,7 +52,7 @@ class CardExample extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => EventPage(
-          id:id,
+          id: id,
           nome: nome,
           description: description,
           data: data,
@@ -60,7 +60,15 @@ class CardExample extends StatelessWidget {
           schedules: schedules,
         ),
       ),
-    );
+    ).then((value) {
+      if (value != null && value is bool) {
+        // Recarrega a página principal quando voltar da página de evento
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainPage()),
+        );
+      }
+    });
   }
 
   @override
@@ -253,8 +261,7 @@ class _MainPageState extends State<MainPage>
               leading: const Icon(Icons.home),
               title: const Text('Home'),
               onTap: () {
-                Navigator.popUntil(context, ModalRoute.withName('/'));
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const HomePage()),
                 );
@@ -264,10 +271,10 @@ class _MainPageState extends State<MainPage>
               leading: const Icon(Icons.settings),
               title: const Text('Configurações'),
               onTap: () {
-                Navigator.popUntil(context, ModalRoute.withName('/'));
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => ConfigPage()),
+                      (Route<dynamic> route) => false,
                 );
               },
             ),
@@ -276,10 +283,10 @@ class _MainPageState extends State<MainPage>
               title: const Text('Ajuda'),
               key: const Key("helpPageButton"),
               onTap: () {
-                Navigator.popUntil(context, ModalRoute.withName('/'));
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => HelpPage()),
+                      (Route<dynamic> route) => false,
                 );
               },
             ),
@@ -327,7 +334,7 @@ class _MainPageState extends State<MainPage>
                     children: filteredEvents
                         .map(
                           (evento) => CardExample(
-                            id: evento.id,
+                        id: evento.id,
                         nome: evento.name,
                         description: evento.description,
                         data: evento.date,
@@ -369,7 +376,7 @@ class _MainPageState extends State<MainPage>
                     children: filteredEvents
                         .map(
                           (evento) => CardExample(
-                            id: evento.id,
+                        id: evento.id,
                         nome: evento.name,
                         description: evento.description,
                         data: evento.date,
@@ -443,7 +450,7 @@ class EventSearchDelegate extends SearchDelegate<String> {
         final Evento evento = filteredEvents[index];
 
         return CardExample(
-          id:evento.id,
+          id: evento.id,
           nome: evento.name,
           description: evento.description,
           data: evento.date,
@@ -473,7 +480,7 @@ class EventSearchDelegate extends SearchDelegate<String> {
               context,
               MaterialPageRoute(
                 builder: (context) => EventPage(
-                  id:evento.id,
+                  id: evento.id,
                   nome: evento.name,
                   description: evento.description,
                   data: evento.date,

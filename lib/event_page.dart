@@ -27,6 +27,7 @@ class EventPage extends StatefulWidget {
 
 class _EventPageState extends State<EventPage> {
   bool favoritado = false;
+  bool isFavoriteStatusLoaded = false;
   final ApiClient _apiClient = ApiClient();
 
   @override
@@ -40,6 +41,7 @@ class _EventPageState extends State<EventPage> {
       final response = await _apiClient.checkFavorite(widget.id, context);
       setState(() {
         favoritado = response.data == "true";
+        isFavoriteStatusLoaded = true;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,131 +59,179 @@ class _EventPageState extends State<EventPage> {
     );
   }
 
+  Future<void> _toggleFavoriteStatus() async {
+    try {
+      if (favoritado) {
+        await _apiClient.UnFavorite(widget.id, context);
+      } else {
+        await _apiClient.Favorite(widget.id, context);
+      }
+      setState(() {
+        favoritado = !favoritado;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error toggling favorite status'),
+        ),
+      );
+    }
+  }
+
+  String formatDateTime(String dateTimeString) {
+    final DateTime dateTime = DateTime.parse(dateTimeString);
+    final String formattedDate =
+        '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}';
+    final String formattedTime =
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    return '$formattedTime $formattedDate';
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Eventos Minerva'),
-        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Align(
-              alignment: Alignment.topCenter,
-              child: Image(
-                width: double.infinity,
-                height: 200.0,
-                fit: BoxFit.cover,
-                image: NetworkImage(widget.url),
+    if (!isFavoriteStatusLoaded) {
+      // Exibir um widget de carregamento enquanto aguarda a resposta da requisição
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Eventos Minerva'),
+          systemOverlayStyle:
+          const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    return WillPopScope(
+      onWillPop: () async {
+        // Recarregar eventos favoritados
+        Navigator.pop(context, true);
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Eventos Minerva'),
+          systemOverlayStyle:
+          const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: Image(
+                  width: double.infinity,
+                  height: 200.0,
+                  fit: BoxFit.cover,
+                  image: NetworkImage(widget.url),
+                ),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          widget.nome.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              widget.nome.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.visible,
+                            ),
                           ),
-                          overflow: TextOverflow.visible,
                         ),
-                      ),
-                      Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            favoritado = !favoritado;
-                          });
-                        },
-                        child: Icon(
-                          favoritado ? Icons.favorite : Icons.favorite_border,
-                          color: favoritado ? Colors.pink : Colors.black87,
-                          size: 20,
+                        GestureDetector(
+                          onTap: _toggleFavoriteStatus,
+                          child: Icon(
+                            favoritado ? Icons.favorite : Icons.favorite_border,
+                            color: favoritado ? Colors.red : Colors.black87,
+                            size: 20,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    widget.description.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  FilledButton.tonal(
-                    key: const Key("scheduleButton"),
-                    onPressed: () =>
-                        _openProgramming(context, widget.schedules),
-                    child: const Text('PROGRAMAÇÃO'),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      backgroundColor: Color(0xffd08c22),
-                    ),
-                  ),
-                  SizedBox(height: 32),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      'INFORMAÇÕES DO EVENTO',
+                    SizedBox(height: 16),
+                    Text(
+                      widget.description.toUpperCase(),
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Colors.grey,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        color: Colors.black87,
-                        size: 24,
+                    SizedBox(height: 16),
+                    FilledButton.tonal(
+                      key: const Key("scheduleButton"),
+                      onPressed: () =>
+                          _openProgramming(context, widget.schedules),
+                      child: const Text('PROGRAMAÇÃO'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        backgroundColor: Color(0xffd08c22),
                       ),
-                      SizedBox(width: 8),
-                      Text(
-                        widget.data,
+                    ),
+                    SizedBox(height: 32),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        'INFORMAÇÕES DO EVENTO',
                         style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.place_outlined,
-                        color: Colors.black87,
-                        size: 24,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        "Local",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          color: Colors.black87,
+                          size: 24,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        SizedBox(width: 8),
+                        Text(
+                          formatDateTime(widget.data),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.place_outlined,
+                          color: Colors.black87,
+                          size: 24,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          "Local",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

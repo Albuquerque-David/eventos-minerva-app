@@ -38,8 +38,6 @@ class _HelpPageState extends State<HelpPage>
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
 
-
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Eventos Minerva"),
@@ -145,13 +143,15 @@ class _HelpPageState extends State<HelpPage>
             SizedBox(height: 32),
             ElevatedButton(
               onPressed: _sendEmail,
-              child: Text('Entre em Contato Conosco'),
-              style: FilledButton.styleFrom(
+              child: Text(
+                'Entre em Contato Conosco',
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
                 backgroundColor: const Color(0xffd08c22),
-                textStyle: TextStyle(
-                  color: Colors.black87
-                )
               ),
             ),
           ],
@@ -165,7 +165,6 @@ class _HelpPageState extends State<HelpPage>
     setState(() {
       userEmail = prefs.getString('email') ?? '';
     });
-
   }
 
   void _sendEmail() async {

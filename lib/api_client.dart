@@ -24,6 +24,7 @@ class ApiClient {
 
   Future<Response> checkFavorite(String id, BuildContext context) async {
     try {
+      //print(id);
       String token = await getToken();
       Response response = await _dio.get(
           'https://eventos-minerva-api.vercel.app/checkFavorite/$id',
@@ -32,6 +33,9 @@ class ApiClient {
               'Authorization': 'Bearer $token',
             },
       ));
+      print("check:\n");
+      print(response);
+      print("\n----\n");
       return response;
 
     } on DioException catch (e) {
@@ -45,7 +49,10 @@ class ApiClient {
     try {
       String token = await getToken();
       Response response = await _dio.post(
-          'https://eventos-minerva-api.vercel.app/favorite/$id',
+          'https://eventos-minerva-api.vercel.app/favorite',
+        data: {
+          'idEvent': id,
+        },
           options: Options(
             headers: {
               'Authorization': 'Bearer $token',
@@ -61,10 +68,14 @@ class ApiClient {
   }
 
   Future<Response> UnFavorite(String id, BuildContext context) async {
+    print("\naaaaaaaaaaaaaaa\n");
     try {
       String token = await getToken();
       Response response = await _dio.delete(
-          'https://eventos-minerva-api.vercel.app/unfavorite/$id',
+          'https://eventos-minerva-api.vercel.app/unfavorite',
+          data: {
+            'idEvent': id,
+          },
             options: Options(
               headers: {
                 'Authorization': 'Bearer $token',
