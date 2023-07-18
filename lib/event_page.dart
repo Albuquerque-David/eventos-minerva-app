@@ -81,11 +81,14 @@ class _EventPageState extends State<EventPage> {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        widget.nome.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          widget.nome.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.visible,
                         ),
                       ),
                       Spacer(),
