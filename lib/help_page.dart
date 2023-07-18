@@ -154,7 +154,10 @@ class _HelpPageState extends State<HelpPage>
 
   Future<void> _getUserEmailFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userEmail = prefs.getString('email') ?? '';
+    setState(() {
+      userEmail = prefs.getString('email') ?? '';
+    });
+
   }
 
   void _sendEmail() async {

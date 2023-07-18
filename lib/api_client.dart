@@ -34,11 +34,14 @@ class ApiClient {
 
   Future<Response> checkFavorite(String id, BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.get(
-          'https://eventos-minerva-api.vercel.app/checkFavorite/$id');
-      print("aaaaaaaaaa\n");
-      print(response.data);
-      print("aaaaaaaaaa\n");
+          'https://eventos-minerva-api.vercel.app/checkFavorite/$id',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+      ));
       return response;
 
     } on DioException catch (e) {
@@ -50,8 +53,14 @@ class ApiClient {
 
   Future<Response> Favorite(String id, BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.post(
-          'https://eventos-minerva-api.vercel.app/favorite/$id');
+          'https://eventos-minerva-api.vercel.app/favorite/$id',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+      ));
 
       return response;
 
@@ -63,8 +72,14 @@ class ApiClient {
 
   Future<Response> UnFavorite(String id, BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.delete(
-          'https://eventos-minerva-api.vercel.app/unfavorite/$id');
+          'https://eventos-minerva-api.vercel.app/unfavorite/$id',
+            options: Options(
+              headers: {
+                'Authorization': 'Bearer $token',
+              },
+      ));
 
       return response;
 
@@ -132,8 +147,14 @@ class ApiClient {
 
   Future<Response?> fetchFavoriteEvents(BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.get(
         'https://eventos-minerva-api.vercel.app/favorites',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        )
       );
 
       await Future.forEach(response.data as List<dynamic>, (event) async {
@@ -152,8 +173,14 @@ class ApiClient {
 
   Future<Response> getUserProfileData(BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.get(
         'https://eventos-minerva-api.vercel.app/getUserData',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        )
       );
       return response;
     } on DioException catch (e) {
@@ -174,6 +201,16 @@ class ApiClient {
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return e.response!.data;
+    }
+  }
+
+  Future<String> getToken() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? token = sharedPreferences.getString("token");
+    if(token!.isEmpty) {
+      return '';
+    } else {
+      return token;
     }
   }
 

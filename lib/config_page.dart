@@ -127,6 +127,8 @@ class _ConfigPageState extends State<ConfigPage>
 
   Future<void> _getUserEmailFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userEmail = prefs.getString('email') ?? '';
+    setState(() {
+      userEmail = prefs.getString('email') ?? '';
+    });
   }
 }
