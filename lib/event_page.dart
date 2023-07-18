@@ -39,7 +39,6 @@ class _EventPageState extends State<EventPage> {
   Future<void> _initializeFavoriteStatus() async {
     try {
       final response = await _apiClient.checkFavorite(widget.id, context);
-      print(response.data);
       setState(() {
         favoritado = response.data == "true";
         isFavoriteStatusLoaded = true;
@@ -172,6 +171,7 @@ class _EventPageState extends State<EventPage> {
                     ),
                     SizedBox(height: 16),
                     FilledButton.tonal(
+                      key: const Key("scheduleButton"),
                       onPressed: () =>
                           _openProgramming(context, widget.schedules),
                       child: const Text('PROGRAMAÇÃO'),

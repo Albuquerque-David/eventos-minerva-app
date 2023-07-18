@@ -106,6 +106,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: TextField(
+                        key: const Key("email"),
                         controller: _emailController,
                         decoration: InputDecoration(
                           border: InputBorder.none,
@@ -133,6 +134,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: TextField(
+                        key: const Key("password"),
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
@@ -153,6 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: GestureDetector(
+                    key: const Key("signup"),
                     onTap: () async {
                       bool signedUp = await signUp();
                       if (signedUp) {

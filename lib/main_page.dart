@@ -199,6 +199,7 @@ class _MainPageState extends State<MainPage>
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
+              key: const Key("hamburguerMenu"),
               icon: const Icon(Icons.menu),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
@@ -280,6 +281,7 @@ class _MainPageState extends State<MainPage>
             ListTile(
               leading: const Icon(Icons.help_center),
               title: const Text('Ajuda'),
+              key: const Key("helpPageButton"),
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -327,6 +329,7 @@ class _MainPageState extends State<MainPage>
                         .contains(searchQuery.toLowerCase());
                   }).toList();
                   return Column(
+                    key: const Key("eventCard"),
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: filteredEvents
                         .map(
