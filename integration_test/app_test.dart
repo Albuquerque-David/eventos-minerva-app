@@ -16,6 +16,7 @@ void main(){
           await tester.enterText(find.byType(TextField).at(0), 'username');
           await tester.enterText(find.byType(TextField).at(1), 'password');
           await tester.tap(find.byKey(Key('login')));
+          await tester.pumpAndSettle();
 
           expect(find.byType(HomePage), findsOneWidget);
         },
