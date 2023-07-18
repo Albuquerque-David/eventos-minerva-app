@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:eventos_minerva/event_schedule.dart';
 import 'package:eventos_minerva/api_client.dart';
+import 'package:flutter/services.dart';
 import 'main_page.dart';
 
 class EventPage extends StatefulWidget {
@@ -58,9 +59,14 @@ class _EventPageState extends State<EventPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Eventos Minerva'),
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -121,6 +127,7 @@ class _EventPageState extends State<EventPage> {
                     child: const Text('PROGRAMAÇÃO'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
+                      backgroundColor: Color(0xffd08c22),
                     ),
                   ),
                   SizedBox(height: 32),

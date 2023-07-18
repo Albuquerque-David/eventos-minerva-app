@@ -22,6 +22,7 @@ class _ConfigPageState extends State<ConfigPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _getUserEmailFromSharedPreferences();
   }
 
   @override
@@ -61,7 +62,7 @@ class _ConfigPageState extends State<ConfigPage>
           children: [
             Container(
               child: UserAccountsDrawerHeader(
-                accountName: Text('Nome do usuário'),
+                accountName: Text(''),
                 accountEmail: Text(userEmail),
                 currentAccountPicture: const CircleAvatar(
                   backgroundImage: NetworkImage(

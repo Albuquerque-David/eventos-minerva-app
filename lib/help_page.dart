@@ -23,6 +23,7 @@ class _HelpPageState extends State<HelpPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _getUserEmailFromSharedPreferences();
   }
 
   @override
@@ -37,7 +38,7 @@ class _HelpPageState extends State<HelpPage>
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
 
-    _getUserEmailFromSharedPreferences();
+
 
     return Scaffold(
       appBar: AppBar(
@@ -62,7 +63,7 @@ class _HelpPageState extends State<HelpPage>
           children: [
             Container(
               child: UserAccountsDrawerHeader(
-                accountName: Text('Nome do usuário'),
+                accountName: Text(''),
                 accountEmail: Text(userEmail),
                 currentAccountPicture: const CircleAvatar(
                   backgroundImage: NetworkImage(
@@ -145,6 +146,13 @@ class _HelpPageState extends State<HelpPage>
             ElevatedButton(
               onPressed: _sendEmail,
               child: Text('Entre em Contato Conosco'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                backgroundColor: const Color(0xffd08c22),
+                textStyle: TextStyle(
+                  color: Colors.black87
+                )
+              ),
             ),
           ],
         ),
