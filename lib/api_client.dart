@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiClient {
   final Dio _dio = Dio();
 
-  Future<Response> signUp(String email, String password, BuildContext context) async {
+  Future signUp(String email, String password, BuildContext context) async {
     try {
       Response response = await _dio.post(
           'https://eventos-minerva-api.vercel.app/signup',
@@ -14,31 +14,24 @@ class ApiClient {
             'email': email,
             'password': password
           });
-      return response.data;
+      ScaffoldMessenger.of(context).showSnackBar(snackBarSuccess);
+      return;
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return e.response!.data;
     }
   }
 
-  Future register(String name, String email, String password, BuildContext context) async {
-    // Simulating a registration process
-    await Future.delayed(Duration(seconds: 2));
-
-    // Returning a successful response
-    return {
-      'success': true,
-      'message': 'Registration successful!',
-    };
-  }
-
   Future<Response> checkFavorite(String id, BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.get(
-          'https://eventos-minerva-api.vercel.app/checkFavorite/$id');
-      print("aaaaaaaaaa\n");
-      print(response.data);
-      print("aaaaaaaaaa\n");
+          'https://eventos-minerva-api.vercel.app/checkFavorite/$id',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+      ));
       return response;
 
     } on DioException catch (e) {
@@ -50,8 +43,14 @@ class ApiClient {
 
   Future<Response> Favorite(String id, BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.post(
-          'https://eventos-minerva-api.vercel.app/favorite/$id');
+          'https://eventos-minerva-api.vercel.app/favorite/$id',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+      ));
 
       return response;
 
@@ -63,8 +62,14 @@ class ApiClient {
 
   Future<Response> UnFavorite(String id, BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.delete(
-          'https://eventos-minerva-api.vercel.app/unfavorite/$id');
+          'https://eventos-minerva-api.vercel.app/unfavorite/$id',
+            options: Options(
+              headers: {
+                'Authorization': 'Bearer $token',
+              },
+      ));
 
       return response;
 
@@ -132,8 +137,14 @@ class ApiClient {
 
   Future<Response?> fetchFavoriteEvents(BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.get(
         'https://eventos-minerva-api.vercel.app/favorites',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        )
       );
 
       await Future.forEach(response.data as List<dynamic>, (event) async {
@@ -152,8 +163,14 @@ class ApiClient {
 
   Future<Response> getUserProfileData(BuildContext context) async {
     try {
+      String token = await getToken();
       Response response = await _dio.get(
         'https://eventos-minerva-api.vercel.app/getUserData',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        )
       );
       return response;
     } on DioException catch (e) {
@@ -177,6 +194,16 @@ class ApiClient {
     }
   }
 
+  Future<String> getToken() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? token = sharedPreferences.getString("token");
+    if(token!.isEmpty) {
+      return '';
+    } else {
+      return token;
+    }
+  }
+
   final snackBar = const SnackBar(content: Text(
     'Ocorreu um erro!', textAlign: TextAlign.center,
   ), backgroundColor: Colors.redAccent);
@@ -184,4 +211,8 @@ class ApiClient {
   final snackBarInvalidLogin = const SnackBar(content: Text(
     'Usuário ou senha inválidos!', textAlign: TextAlign.center,
   ), backgroundColor: Colors.redAccent);
+
+  final snackBarSuccess = const SnackBar(content: Text(
+    'Cadastro realizado com sucesso!', textAlign: TextAlign.center,
+  ), backgroundColor: Colors.greenAccent);
 }

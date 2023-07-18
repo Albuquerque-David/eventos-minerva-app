@@ -28,8 +28,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future signUp() async {
     try {
-      var response = await _apiClient.register(
-        _nameController.text.trim(),
+      await _apiClient.signUp(
         _emailController.text.trim(),
         _passwordController.text.trim(),
         context,
@@ -55,7 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
       final emailRegex =
           r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})$';
       final RegExp regex = RegExp(emailRegex);
-      return !regex.hasMatch(value);
+      return true;
     }
   }
 
@@ -63,7 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
     if (value.isEmpty) {
       return true;
     } else {
-      return value.length < 8;
+      return value.length >= 8;
     }
   }
 
@@ -96,27 +95,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      border: Border.all(color: Colors.white),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Nome',
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Container(

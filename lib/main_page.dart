@@ -170,6 +170,7 @@ class _MainPageState extends State<MainPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _getUserEmailFromSharedPreferences();
   }
 
   @override
@@ -184,8 +185,6 @@ class _MainPageState extends State<MainPage>
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
 
-    _getUserEmailFromSharedPreferences();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Eventos Minerva"),
@@ -199,8 +198,7 @@ class _MainPageState extends State<MainPage>
             );
           },
         ),
-        systemOverlayStyle:
-        const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.search),
@@ -239,7 +237,7 @@ class _MainPageState extends State<MainPage>
           children: [
             Container(
               child: UserAccountsDrawerHeader(
-                accountName: Text('Nome do usuário'),
+                accountName: Text(''),
                 accountEmail: Text(userEmail),
                 currentAccountPicture: const CircleAvatar(
                   backgroundImage: NetworkImage(
@@ -391,7 +389,9 @@ class _MainPageState extends State<MainPage>
 
   Future<void> _getUserEmailFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userEmail = prefs.getString('email') ?? '';
+    setState(() {
+      userEmail = prefs.getString('email') ?? '';
+    });
   }
 }
 

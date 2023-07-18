@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'main_page.dart';
 
@@ -60,9 +61,14 @@ class _ProgrammingPageState extends State<ProgrammingPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Programação'),
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Color(0xffd08c22)),
       ),
       body: Column(
         children: [
