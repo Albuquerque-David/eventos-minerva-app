@@ -39,7 +39,7 @@ class _EventPageState extends State<EventPage> {
     try {
       final response = await _apiClient.checkFavorite(widget.id, context);
       setState(() {
-        favoritado = response == 'true';
+        favoritado = response.data == "true";
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
