@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiClient {
   final Dio _dio = Dio();
 
-  Future<Response> signUp(String email, String password, BuildContext context) async {
+  Future signUp(String email, String password, BuildContext context) async {
     try {
       Response response = await _dio.post(
           'https://eventos-minerva-api.vercel.app/signup',
@@ -14,22 +14,12 @@ class ApiClient {
             'email': email,
             'password': password
           });
-      return response.data;
+      ScaffoldMessenger.of(context).showSnackBar(snackBarSuccess);
+      return;
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return e.response!.data;
     }
-  }
-
-  Future register(String name, String email, String password, BuildContext context) async {
-    // Simulating a registration process
-    await Future.delayed(Duration(seconds: 2));
-
-    // Returning a successful response
-    return {
-      'success': true,
-      'message': 'Registration successful!',
-    };
   }
 
   Future<Response> checkFavorite(String id, BuildContext context) async {
@@ -221,4 +211,8 @@ class ApiClient {
   final snackBarInvalidLogin = const SnackBar(content: Text(
     'Usuário ou senha inválidos!', textAlign: TextAlign.center,
   ), backgroundColor: Colors.redAccent);
+
+  final snackBarSuccess = const SnackBar(content: Text(
+    'Cadastro realizado com sucesso!', textAlign: TextAlign.center,
+  ), backgroundColor: Colors.greenAccent);
 }
