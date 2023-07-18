@@ -122,6 +122,7 @@ class _EventPageState extends State<EventPage> {
                   ),
                   SizedBox(height: 16),
                   FilledButton.tonal(
+                    key: const Key("scheduleButton"),
                     onPressed: () =>
                         _openProgramming(context, widget.schedules),
                     child: const Text('PROGRAMAÇÃO'),
